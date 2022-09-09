@@ -115,25 +115,25 @@ One note before you delve into your tasks: for each endpoint, you are expected t
 curl http://localhost:5000/questions
 ```
 
-* With a _**page**_ parameter where we request page two:
+* Including the _**page**_ number parameter, we want to see "page two":
 
 ```powershell
 curl http://localhost:5000/questions?page=2
 ```
-  * See the example response below for page two!
+  * The example response for the "page two" query is shown below.
 ---
 **ℹ️ _N.B._**
 
-> The pages in the trivia API questions endpoint start at _**page 1**_. Requesting questions _**page zero**_ would be considered *invalid* by the API.
+> The pages in the trivia API questions endpoint begin at _**page 1**_. Requesting questions _**page zero**_, for example, would be considered an *invalid* request by the API, and would generate an error.
 
 ---
-**ℹ️ _Time saving tip_**
+**ℹ️ _A time saving tip for applications building on the Trivia API_**
 
-> In your application, there's *no need* to orchestrate calling the category API endpoint if you're calling the questions endpoint soon after. The trivia API always returns all the categories alongside the page of questions.
+> You *don't* need to separately orchestrate calling the Category endpoint, when you're already calling the questions endpoint. You'll note that the trivia API already returns all of the trivia categories, alongside the set of questions.
 
 ---
 
-#### 2.2 Example response
+#### 2.2 Question endpoint example response - "page two"
 ```json
 {
   "categories": {
@@ -222,7 +222,6 @@ curl http://localhost:5000/questions?page=2
  - This is keyed on the _**question_id**_ field, it's mandatory to include this.
 
 ### 3.1 Example requests using CURL
-
 `curl -X DELETE http://localhost:5000/questions/14`
 
 ### 3.2 Example response
@@ -245,33 +244,37 @@ curl http://localhost:5000/questions?page=2
 ## 5. Search for questions
 `POST /questions/search`
 
+### 5.1 Example request
+`curl `
+### 5.2 Example response
+```json
+{
+  "deleted": 14, 
+  "success": true
+}
+```
+
 ## 6. Find questions by category
 `GET /categories/{id}/questions`
+### 6.1 Example request 
+`curl `
+### 6.2 Example response
+```json
+{
+  "deleted": 14, 
+  "success": true
+}
+```
 
 ## 7. Post a quiz result
 `POST /quizzes`
-
-
-## Documenting your Endpoints
-
-You will need to provide detailed documentation of your API endpoints including the URL, request parameters, and the response body. Use the example below as a reference.
-
-### Documentation Example
-
-`GET '/api/v1.0/categories'`
-
-- Fetches a dictionary of categories in which the keys are the ids and the value is the corresponding string of the category
-- Request Arguments: None
-- Returns: An object with a single key, `categories`, that contains an object of `id: category_string` key: value pairs.
-
+### 7.1 Example request 
+`curl `
+### 7.2 Example response
 ```json
 {
-  "1": "Science",
-  "2": "Art",
-  "3": "Geography",
-  "4": "History",
-  "5": "Entertainment",
-  "6": "Sports"
+  "deleted": 14, 
+  "success": true
 }
 ```
 

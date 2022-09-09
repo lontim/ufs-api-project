@@ -67,6 +67,61 @@ One note before you delve into your tasks: for each endpoint, you are expected t
 8. Create a `POST` endpoint to get questions to play the quiz. This endpoint should take a category and previous question parameters and return a random questions within the given category, if provided, and that is not one of the previous questions.
 9. Create error handlers for all expected errors including 400, 404, 422, and 500.
 
+
+## Trivia API Reference
+
+## 1. Get category endpoint
+
+`GET /categories`
+
+- Fetches a dictionary of categories.
+  - Keys are IDs
+  - Values are strings of each category
+
+#### Example request using CURL
+`curl http://localhost:5000/categories`
+
+#### Example response
+```json
+{
+  "1": "Science",
+  "2": "Art",
+  "3": "Geography",
+  "4": "History",
+  "5": "Entertainment",
+  "6": "Sports"
+}
+```
+
+## 2. Get questions endpoint
+
+`GET /questions`
+
+ - Fetches a page of questions (max 10 per page)
+   - You may also provide an optional _**page**_ parameter - this comes in handy once your database of questions increases in size
+   - If the page is not specified, the API will assume you want the first page
+
+### Example requests using CURL
+
+* No _**page**_ specified:
+
+```powershell
+curl http://localhost:5000/questions
+```
+
+* With a _**page**_ parameter:
+
+```powershell
+curl http://localhost:5000/questions?page=2
+```
+
+---
+**NOTE**
+
+The pages in the trivia API questions endpoint start at _**page 1**_. There's no `page=0`.
+
+---
+
 ## Documenting your Endpoints
 
 You will need to provide detailed documentation of your API endpoints including the URL, request parameters, and the response body. Use the example below as a reference.

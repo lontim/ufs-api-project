@@ -34,7 +34,7 @@ def create_app(test_config=None):
     """
     @app.route("/categories", methods=["GET"])
     def get_categories():
-        all_categories = Category.query.all()
+        all_categories = Category.query.order_by(Category.id).all()
         category_dict = {}
 
         if len(all_categories) == 0:
@@ -47,10 +47,9 @@ def create_app(test_config=None):
 
 
     """
-    @TODO:
-    Create an endpoint to handle GET requests for questions,
+    Endpoint to handle GET requests for questions,
     including pagination (every 10 questions).
-    This endpoint should return a list of questions,
+    This endpoint returns a list of questions,
     number of total questions, current category, categories.
 
     TEST: At this point, when you start the application
@@ -58,6 +57,46 @@ def create_app(test_config=None):
     ten questions per page and pagination at the bottom of the screen for three pages.
     Clicking on the page numbers should update the questions.
     """
+    @app.route("/questions", methods=["GET"])
+    def get_questions():
+        all_questions = Question.query.order_by(Question.id).all()
+
+        page_param = request.args.get("page", 1, type=int) # enabling pagination
+        # if page_param <= 1:
+        #            abort(404) # show an HTTP 404 or 204 if a page number below "one" was requested
+        # the API assumes that the first page is "1" so need to factor this in to determine
+        # the actual question identifiers within the range. So, set our real "page" as param - 1:
+        page = page_param - 1
+        first_question_id = (page) * QUESTIONS_PER_PAGE
+        max_question_id = first_question_id + QUESTIONS_PER_PAGE
+
+        all_question_list = []
+
+        for single_question in all_questions:
+            all_question_list.append(single_question.format())
+
+        questions_subset_dict = all_question_list[first_question_id:max_question_id]
+
+        if len(questions_subset_dict) == 0:
+            abort(404)
+
+        all_categories = Category.query.order_by(Category.id).all()
+        category_dict = {}
+
+        # if len(all_categories) == 0:
+        #    abort(404) # show an HTTP 404 or 204 no content response if no categories exist
+
+        for single_category in all_categories:
+            category_dict[single_category.id] = single_category.type
+
+        return jsonify(
+            {
+                "questions": questions_subset_dict,
+                "totalQuestions": len(all_questions),
+                "categories": category_dict,
+                "currentCategory": None,
+            }
+        )
 
     """
     @TODO:

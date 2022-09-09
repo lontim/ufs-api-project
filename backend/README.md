@@ -78,10 +78,10 @@ One note before you delve into your tasks: for each endpoint, you are expected t
   - Keys are IDs
   - Values are strings of each category
 
-#### Example request using CURL
+### 1.1 Example request using CURL
 `curl http://localhost:5000/categories`
 
-#### Example response
+#### 1.2 Example response
 ```json
 {
   "1": "Science",
@@ -89,7 +89,8 @@ One note before you delve into your tasks: for each endpoint, you are expected t
   "3": "Geography",
   "4": "History",
   "5": "Entertainment",
-  "6": "Sports"
+  "6": "Sports",
+  "7": "Lunar Exploration"
 }
 ```
 
@@ -99,9 +100,14 @@ One note before you delve into your tasks: for each endpoint, you are expected t
 
  - Fetches a page of questions (max 10 per page)
    - You may also provide an optional _**page**_ parameter - this comes in handy once your database of questions increases in size
-   - If the page is not specified, the API will assume you want the first page
+   - If the page is not specified, the API assumes you want the first page
+   - In the response, you'll receive
+     - a list of questions
+     - number of total questions
+     - current category
+     - categories
 
-### Example requests using CURL
+### 2.1 Example requests using CURL
 
 * No _**page**_ specified:
 
@@ -116,11 +122,21 @@ curl http://localhost:5000/questions?page=2
 ```
 
 ---
-**NOTE**
+**ℹ️ _N.B._**
 
-The pages in the trivia API questions endpoint start at _**page 1**_. There's no `page=0`.
+> The pages in the trivia API questions endpoint start at _**page 1**_. Requesting questions _**page zero**_ would be considered *invalid* by the API.
 
 ---
+**ℹ️ _Time saving tip_**
+
+> In your application, there's *no need* to orchestrate calling the category API endpoint if you're calling the questions endpoint soon after. The trivia API always returns all the categories alongside the page of questions.
+
+---
+
+#### 2.2 Example response
+```json
+
+```
 
 ## Documenting your Endpoints
 

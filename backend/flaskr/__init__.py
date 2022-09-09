@@ -111,7 +111,10 @@ def create_app(test_config=None):
         question = Question.query.get(id)
         if not question:
             abort(404)
-
+        try:
+            question.delete()
+        except:
+            abort(422)
         return jsonify(
             {
                 "success": True,

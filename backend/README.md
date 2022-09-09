@@ -115,12 +115,12 @@ One note before you delve into your tasks: for each endpoint, you are expected t
 curl http://localhost:5000/questions
 ```
 
-* With a _**page**_ parameter:
+* With a _**page**_ parameter where we request page two:
 
 ```powershell
 curl http://localhost:5000/questions?page=2
 ```
-
+  * See the example response below for page two!
 ---
 **ℹ️ _N.B._**
 
@@ -135,8 +135,122 @@ curl http://localhost:5000/questions?page=2
 
 #### 2.2 Example response
 ```json
-
+{
+  "categories": {
+    "1": "Science", 
+    "2": "Art", 
+    "3": "Geography", 
+    "4": "History", 
+    "5": "Entertainment", 
+    "6": "Sports"
+  }, 
+  "currentCategory": null, 
+  "questions": [
+    {
+      "answer": "Agra", 
+      "category": 3, 
+      "difficulty": 2, 
+      "id": 15, 
+      "question": "The Taj Mahal is located in which Indian city?"
+    }, 
+    {
+      "answer": "Escher", 
+      "category": 2, 
+      "difficulty": 1, 
+      "id": 16, 
+      "question": "Which Dutch graphic artist\u2013initials M C was a creator of optical illusions?"
+    }, 
+    {
+      "answer": "Mona Lisa", 
+      "category": 2, 
+      "difficulty": 3, 
+      "id": 17, 
+      "question": "La Giaconda is better known as what?"
+    }, 
+    {
+      "answer": "One", 
+      "category": 2, 
+      "difficulty": 4, 
+      "id": 18, 
+      "question": "How many paintings did Van Gogh sell in his lifetime?"
+    }, 
+    {
+      "answer": "Jackson Pollock", 
+      "category": 2, 
+      "difficulty": 2, 
+      "id": 19, 
+      "question": "Which American artist was a pioneer of Abstract Expressionism, and a leading exponent of action painting?"
+    }, 
+    {
+      "answer": "The Liver", 
+      "category": 1, 
+      "difficulty": 4, 
+      "id": 20, 
+      "question": "What is the heaviest organ in the human body?"
+    }, 
+    {
+      "answer": "Alexander Fleming", 
+      "category": 1, 
+      "difficulty": 3, 
+      "id": 21, 
+      "question": "Who discovered penicillin?"
+    }, 
+    {
+      "answer": "Blood", 
+      "category": 1, 
+      "difficulty": 4, 
+      "id": 22, 
+      "question": "Hematology is a branch of medicine involving the study of what?"
+    }, 
+    {
+      "answer": "Scarab", 
+      "category": 4, 
+      "difficulty": 4, 
+      "id": 23, 
+      "question": "Which dung beetle was worshipped by the ancient Egyptians?"
+    }
+  ], 
+  "totalQuestions": 19
+}
 ```
+
+## 3. Delete questions endpoint
+
+`DELETE /questions/<question_identifier>`
+
+ - Deletes a question, if it exists.
+ - This is keyed on the _**question_id**_ field, it's mandatory to include this.
+
+### 3.1 Example requests using CURL
+
+`curl -X DELETE http://localhost:5000/questions/14`
+
+### 3.2 Example response
+```json
+{
+  "deleted": 14, 
+  "success": true
+}
+```
+## 4. Create a new question
+`POST /questions`
+
+ - this endpoint requires the POST request to pass in:
+   - the new _**question**_ &
+   - _**answer**_ text,
+   - the _**category**_, and
+   - _**difficulty**_ score of the new question.
+
+
+## 5. Search for questions
+`POST /questions/search`
+
+## 6. Find questions by category
+`GET /categories/{id}/questions`
+
+## 7. Post a quiz result
+`POST /quizzes`
+
 
 ## Documenting your Endpoints
 

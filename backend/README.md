@@ -243,27 +243,34 @@ curl http://localhost:5000/questions?page=2
 
 ## 5. Search for questions
 `POST /questions/search`
+ - this endpoint is used to find questions based upon the supplied text fragment
+ - the API will return any questions containing the matching text fragment
 
 ### 5.1 Example request
-`curl `
+`curl -X POST http://localhost:5000/questions/search -H "Content-Type: application/json" -d '{"searchTerm": "discover"}'`
 ### 5.2 Example response
 ```json
 {
-  "deleted": 14, 
-  "success": true
+  "questions": [
+    {
+      "answer": "Alexander Fleming", 
+      "category": 1, 
+      "difficulty": 3, 
+      "id": 21, 
+      "question": "Who discovered penicillin?"
+    }
+  ], 
+  "totalQuestions": 1
 }
 ```
 
 ## 6. Find questions by category
 `GET /categories/{id}/questions`
 ### 6.1 Example request 
-`curl `
+`curl http://localhost:5000/categories/3/questions`
 ### 6.2 Example response
 ```json
-{
-  "deleted": 14, 
-  "success": true
-}
+
 ```
 
 ## 7. Post a quiz result

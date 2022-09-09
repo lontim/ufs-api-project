@@ -123,53 +123,108 @@ def create_app(test_config=None):
         )
 
     """
-    @TODO:
-    Create an endpoint to POST a new question,
-    which will require the question and answer text,
+    GET endpoint to get questions based on category.
+    """
+    @app.route("/categories/<int:id>/questions",methods=["GET"])
+    def get_questions_by_category(id):
+
+        cat_questions = Question.query.filter_by(category=id).all()
+        format_cat_questions = list() # start with an empty list of questions
+
+        for question in cat_questions:
+            format_cat_questions.append(question.format())
+
+        cat = Category.query.get(id)
+
+        return jsonify(
+            {
+                "questions": format_cat_questions,
+                "totalQuestions": len(format_cat_questions),
+                "currentCategory": cat.type,
+            }
+        )
+
+
+    """
+    POST a new question, which requires the question and answer text,
     category, and difficulty score.
-
-    TEST: When you submit a question on the "Add" tab,
-    the form will clear and the question will appear at the end of the last page
-    of the questions list in the "List" tab.
     """
 
-    """
-    @TODO:
-    Create a POST endpoint to get questions based on a search term.
-    It should return any questions for whom the search term
-    is a substring of the question.
+    @app.route("/questions", methods=["POST"])
+    def add_question():
+        request_data = request.get_json()
+        try:
+            question = Question(
+                question=request_data.get("question"),
+                answer=request_data.get("answer"),
+                category=request_data.get("category"),
+                difficulty=request_data.get("difficulty"),
+            )
+            question.insert()
+            return jsonify({'success': True, 'created': question.id})
+        except:
+            abort(422)
 
-    TEST: Search by any phrase. The questions list will update to include
-    only question that include that string within their question.
-    Try using the word "title" to start.
-    """
+    @app.route("/questions/search",methods=["POST"])
+    def search_questions():
+        search_term = request.get_json().get("searchTerm")
+        # print('Reached the search route!', file=sys.stderr)
+        questions_found = Question.query.filter(
+            Question.question.ilike(f"%{search_term}%")
+        )
+        search_results = list()
+        for question in questions_found:
+            search_results.append(question.format())
 
-    """
-    @TODO:
-    Create a GET endpoint to get questions based on category.
+        return jsonify(
+            {
+                "questions": search_results,
+                "totalQuestions": len(search_results)
+            }
+        )
 
-    TEST: In the "List" tab / main screen, clicking on one of the
-    categories in the left column will cause only questions of that
-    category to be shown.
-    """
 
-    """
-    @TODO:
-    Create a POST endpoint to get questions to play the quiz.
-    This endpoint should take category and previous question parameters
-    and return a random questions within the given category,
-    if provided, and that is not one of the previous questions.
+    # POST quizzes endpoint is used to play the quiz.
+    # Takes an optional category and previous questions. Returns a random question
+    # that wasn't already asked (within the optional category if specified).
+    @app.route('/quizzes', methods=['POST'])
+    def quiz():
+        try:
+            post_body = request.get_json()
+            category = post_body.get('quiz_category') # category, if specified.
+            previous_questions = post_body.get('previous_questions')
+            if (category['id'] == 0):
+                questions_filt = Question.query.all() # no category?
+            else:
+                questions_filt = Question.query.filter_by \
+                        (category=category['id']). all()
 
-    TEST: In the "Play" tab, after a user selects "All" or a category,
-    one question at a time is displayed, the user is allowed to answer
-    and shown whether they were correct or not.
-    """
+            next_questions = list()
+            for question in questions_filt:
+                if question.id not in previous_questions:
+                    next_questions.append(question)
 
-    """
-    @TODO:
-    Create error handlers for all expected errors
-    including 404 and 422.
-    """
+            random_choice = random.randint(0, len(next_questions)-1)
+            print (random_choice)
+
+            nextQuestion = next_questions[random_choice]
+            return (jsonify({"question": nextQuestion.format()}))
+        except Exception:
+            abort(422)
+
+    @app.errorhandler(404)
+    def not_found(error):
+        return jsonify({"success": False, "error": 404, "message": "Not found"}), 404
+
+    @app.errorhandler(422)
+    def unprocessable_entity(error):
+        return (
+            jsonify(
+                {"success": False, "error": 422, "message": "Unprocessable entity"}
+            ),
+            422,
+        )
+
 
     return app
 

@@ -62,8 +62,8 @@ def create_app(test_config=None):
         all_questions = Question.query.order_by(Question.id).all()
 
         page_param = request.args.get("page", 1, type=int) # enabling pagination
-        if page_param <= 1:
-            abort(404) # show an HTTP 404 or 204 if a page number below "one" was requested
+        #if (page_param <= 1):
+        #    abort(404) # show an HTTP 404 or 204 if a page number below "one" was requested
         # the API assumes that the first page is "1" so need to factor this in to determine
         # the actual question identifiers within the range. So, set our real "page" as param - 1:
         page = page_param - 1

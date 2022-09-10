@@ -14,7 +14,6 @@ def create_app(test_config=None):
     app = Flask(__name__)
     setup_db(app)
 
-    # Set up CORS. Allow '*' for origins. Delete the sample route after completing the TODOs
     CORS(app, resources={"/api/*": {"origins": "*"}})
 
     # Use the after_request decorator to set Access-Control-Allow
@@ -25,7 +24,7 @@ def create_app(test_config=None):
         )
         response.headers.add(
             "Access-Control-Allow-Headers",
-              "Content-Type" # ,Authorization
+              "Content-Type"
         )
         return response
 
@@ -63,8 +62,8 @@ def create_app(test_config=None):
         all_questions = Question.query.order_by(Question.id).all()
 
         page_param = request.args.get("page", 1, type=int) # enabling pagination
-        # if page_param <= 1:
-        #            abort(404) # show an HTTP 404 or 204 if a page number below "one" was requested
+        if page_param <= 1:
+            abort(404) # show an HTTP 404 or 204 if a page number below "one" was requested
         # the API assumes that the first page is "1" so need to factor this in to determine
         # the actual question identifiers within the range. So, set our real "page" as param - 1:
         page = page_param - 1
@@ -84,8 +83,8 @@ def create_app(test_config=None):
         all_categories = Category.query.order_by(Category.id).all()
         category_dict = {}
 
-        # if len(all_categories) == 0:
-        #    abort(404) # show an HTTP 404 or 204 no content response if no categories exist
+        if len(all_categories) == 0:
+           abort(404) # show an HTTP 404 or 204 no content response if no categories exist
 
         for single_category in all_categories:
             category_dict[single_category.id] = single_category.type
@@ -183,7 +182,6 @@ def create_app(test_config=None):
             }
         )
 
-
     # POST quizzes endpoint is used to play the quiz.
     # Takes an optional category and previous questions. Returns a random question
     # that wasn't already asked (within the optional category if specified).
@@ -210,7 +208,8 @@ def create_app(test_config=None):
             nextQuestion = next_questions[random_choice]
             return (jsonify({"question": nextQuestion.format()}))
         except Exception:
-            abort(422)
+            # there are no appropriate questions left, end of quiz
+            return (jsonify({"forceEnd": "true"}))
 
     @app.errorhandler(404)
     def not_found(error):

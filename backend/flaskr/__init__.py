@@ -159,6 +159,8 @@ def create_app(test_config=None):
                 category=request_data.get("category"),
                 difficulty=request_data.get("difficulty"),
             )
+            if (question.question == ""):
+                abort(422)
             question.insert()
             return jsonify({'success': True, 'created': question.id})
         except:
@@ -203,7 +205,7 @@ def create_app(test_config=None):
                     next_questions.append(question)
 
             random_choice = random.randint(0, len(next_questions)-1)
-            print (random_choice)
+            # print (random_choice)
 
             nextQuestion = next_questions[random_choice]
             return (jsonify({"question": nextQuestion.format()}))

@@ -26,6 +26,11 @@ class TriviaTestCase(unittest.TestCase):
             "category": 1
         }
 
+        self.question_incomplete = {
+            "answer": "100 thousand million stars",
+            "category": 1
+        }
+
         # binds the app to the current context
         with self.app.app_context():
             self.db = SQLAlchemy()
@@ -42,6 +47,11 @@ class TriviaTestCase(unittest.TestCase):
         data = json.loads(res.data)        
         self.assertEqual(res.status_code,200)
 
+    def test_category_fail(self):
+        # try to use delete HTTP method - expect a 405 HTTP error
+        res = self.client().delete("/categories")
+        self.assertEqual(res.status_code,405)
+
     def test_question_happy(self):
         res = self.client().get("/questions?page=2")
         data = json.loads(res.data)        
@@ -57,6 +67,10 @@ class TriviaTestCase(unittest.TestCase):
         res = self.client().post("/questions", json=self.question_to_add)
         self.assertEqual(res.status_code,200)
 
+    def test_question_create_fail(self):
+        res = self.client().post("/questions", json=self.question_incomplete)
+        self.assertEqual(res.status_code,200)
+
     def test_question_delete(self):
         res = self.client().post("/questions", json=self.question_to_add)
         data = json.loads(res.data)
@@ -70,8 +84,8 @@ class TriviaTestCase(unittest.TestCase):
         # expect to see a 404 Not Found
         self.assertEqual(res.status_code, 404)
 
-
-    def test_question_search_happy(self):
+    def test_question_search(self):
+        # try searching for something we know is in a question
         search_payload = {"searchTerm": "graph"}
         res = self.client().post("/questions/search", json=search_payload)
         data = json.loads(res.data)
@@ -79,7 +93,16 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(len(data["questions"]), 2)
 
-    def test_simulate_quiz(self):
+    def test_question_search_failure(self):
+        # try searching for something that isn't in any questions
+        search_payload = {"searchTerm": "null"}
+        res = self.client().post("/questions/search", json=search_payload)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(len(data["questions"]), 0)
+
+    def test_simulate_quiz_happy(self):
         self.get_next_question = {
             "previous_questions": [13, 14],
             "quiz_category": {"type": "Geography", "id": "3"},
@@ -93,6 +116,20 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data["question"].get("id"), 15)
 
+    def test_simulate_quiz_unhappy(self):
+        self.get_next_question = {
+            "previous_questions": [13, 14, 15],
+            "quiz_category": {"type": "Geography", "id": "3"},
+        }
+        # We assume that the user has chosen Geography topic;
+        # last three questions are specified. 
+        # Check that quiz ends.
+        res = self.client().post("/quizzes", json=self.get_next_question)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data["forceEnd"], "true")
+        
     def test_question_search_unhappy(self):
         search_payload = {"searchTerm": "xyzxyz"}
         res = self.client().post("/questions/search", json=search_payload)

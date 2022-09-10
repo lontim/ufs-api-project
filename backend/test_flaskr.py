@@ -41,7 +41,6 @@ class TriviaTestCase(unittest.TestCase):
         res = self.client().get("/categories")
         data = json.loads(res.data)        
         self.assertEqual(res.status_code,200)
-        
 
     def test_question_happy(self):
         res = self.client().get("/questions?page=2")
@@ -65,7 +64,14 @@ class TriviaTestCase(unittest.TestCase):
         res = self.client().delete("/questions/{}".format(added_id))
         self.assertEqual(res.status_code, 200)
 
-    def test_question_search(self):
+    def test_question_delete_fail(self):
+        # try to delete an invalid question ID
+        res = self.client().delete("/questions/7766")
+        # expect to see a 404 Not Found
+        self.assertEqual(res.status_code, 404)
+
+
+    def test_question_search_happy(self):
         search_payload = {"searchTerm": "graph"}
         res = self.client().post("/questions/search", json=search_payload)
         data = json.loads(res.data)
@@ -73,7 +79,28 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(len(data["questions"]), 2)
 
+    def test_simulate_quiz(self):
+        self.get_next_question = {
+            "previous_questions": [13, 14],
+            "quiz_category": {"type": "Geography", "id": "3"},
+        }
+        # We assume that the user has chosen Geography topic;
+        # last two questions are specified. Check correct question
+        # that was not yet asked, is returned.
+        res = self.client().post("/quizzes", json=self.get_next_question)
+        data = json.loads(res.data)
 
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data["question"].get("id"), 15)
+
+    def test_question_search_unhappy(self):
+        search_payload = {"searchTerm": "xyzxyz"}
+        res = self.client().post("/questions/search", json=search_payload)
+        data = json.loads(res.data)
+
+        # confirm that no questions are returned, when incorrect search term provided:
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(len(data["questions"]), 0)
 
 # Make the tests conveniently executable
 if __name__ == "__main__":

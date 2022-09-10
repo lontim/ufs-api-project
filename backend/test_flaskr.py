@@ -6,6 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flaskr import create_app
 from models import setup_db, Question, Category
 
+from settings import DB_NAME, DB_USER, DB_PASSWORD
 
 class TriviaTestCase(unittest.TestCase):
     """This class represents the trivia test case"""
@@ -18,6 +19,13 @@ class TriviaTestCase(unittest.TestCase):
         self.database_path = "postgresql://{}/{}".format('localhost:5432', self.database_name) # "sql" here after "postgres" stops the "dialect name" warning
         setup_db(self.app, self.database_path)
 
+        self.question_to_add = {
+            "question": "How many stars in our galaxy, the Milky Way?",
+            "answer": "100 thousand million stars",
+            "difficulty": 3,
+            "category": 1
+        }
+
         # binds the app to the current context
         with self.app.app_context():
             self.db = SQLAlchemy()
@@ -26,20 +34,46 @@ class TriviaTestCase(unittest.TestCase):
             self.db.create_all()
     
     def tearDown(self):
-        """Executed after reach test"""
+        """Executed after each test"""
         pass
 
-    """
-    TODO
-    Write at least one test for each test for successful operation and for expected errors.
-    """
-
-    def test_too_high_quest_pagination(self):
-        res = self.client().get("")
-        data = json.loads(res.data)
+    def test_category(self):
+        res = self.client().get("/categories")
+        data = json.loads(res.data)        
+        self.assertEqual(res.status_code,200)
         
-        self.assertEqual(data["message","Not found"])
-        self.assertEqual(res.status_code,404)
+
+    def test_question_happy(self):
+        res = self.client().get("/questions?page=2")
+        data = json.loads(res.data)        
+        self.assertEqual(res.status_code,200)
+        # tries to load page 2 of questions - should succeed with 200
+
+    def test_question_fail_high_pagination(self):
+        res = self.client().get("/questions/7")
+        self.assertEqual(res.status_code,405)
+        # this tries to load a non-existant page of questions - expect 405
+
+    def test_question_create(self):
+        res = self.client().post("/questions", json=self.question_to_add)
+        self.assertEqual(res.status_code,200)
+
+    def test_question_delete(self):
+        res = self.client().post("/questions", json=self.question_to_add)
+        data = json.loads(res.data)
+        added_id = data["created"]
+        res = self.client().delete("/questions/{}".format(added_id))
+        self.assertEqual(res.status_code, 200)
+
+    def test_question_search(self):
+        search_payload = {"searchTerm": "graph"}
+        res = self.client().post("/questions/search", json=search_payload)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(len(data["questions"]), 2)
+
+
 
 # Make the tests conveniently executable
 if __name__ == "__main__":
